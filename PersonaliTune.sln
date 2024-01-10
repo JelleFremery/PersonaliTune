@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonaliTune.AzureOpenAI.Api", "PersonaliTune.AzureOpenAI.Api\PersonaliTune.AzureOpenAI.Api.csproj", "{FABE553C-F653-458F-B275-5062AA519DCF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonaliTune.Spotify.Api", "PersonaliTune.Spotify.Api\PersonaliTune.Spotify.Api.csproj", "{31547804-A8A6-42E3-9574-DB3719F0DEEE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonaliTune.UI", "PersonalityTune.UI\PersonaliTune.UI.csproj", "{48427D04-CD12-44BD-8FDA-91077F18B2D6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonaliTune.Models", "PersonaliTune.Models\PersonaliTune.Models.csproj", "{9D6F8357-39BA-47F2-9725-D2D9D345EE9E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{21FA2F2D-A2A6-4263-85E3-2956E3468015}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FABE553C-F653-458F-B275-5062AA519DCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FABE553C-F653-458F-B275-5062AA519DCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FABE553C-F653-458F-B275-5062AA519DCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FABE553C-F653-458F-B275-5062AA519DCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31547804-A8A6-42E3-9574-DB3719F0DEEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31547804-A8A6-42E3-9574-DB3719F0DEEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31547804-A8A6-42E3-9574-DB3719F0DEEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31547804-A8A6-42E3-9574-DB3719F0DEEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48427D04-CD12-44BD-8FDA-91077F18B2D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48427D04-CD12-44BD-8FDA-91077F18B2D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48427D04-CD12-44BD-8FDA-91077F18B2D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48427D04-CD12-44BD-8FDA-91077F18B2D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D6F8357-39BA-47F2-9725-D2D9D345EE9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D6F8357-39BA-47F2-9725-D2D9D345EE9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D6F8357-39BA-47F2-9725-D2D9D345EE9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D6F8357-39BA-47F2-9725-D2D9D345EE9E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {01E7B844-8B89-4D1A-994F-15D5E3745113}
+	EndGlobalSection
+EndGlobal

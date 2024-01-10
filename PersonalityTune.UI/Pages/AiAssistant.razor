@@ -1,0 +1,195 @@
+﻿@using System.Text.Json
+@using PersonaliTune.Models
+@using PersonaliTune.UI.Models
+@using PersonaliTune.UI.Services
+@inject NavigationManager NavManager
+@page "/ai-assistant"
+
+<PageTitle>AI Assistant</PageTitle>
+
+<h1>Consult the PersonaliTune AI Assistant</h1>
+
+@if (!connected)
+{
+    <div class="alert alert-danger">You need to connect a Spotify account first.</div>
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-3 text-center">
+                <div class="card mb-3" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Casual chat</h5>
+                        <p class="card-text">Start a dialogue with the AI assistant</p>
+                        <button class="btn btn-secondary" tooltip="Recommends an artist" type="button" @onclick="Chat">Chat</button>
+                    </div>
+                </div>
+                <div class="card mb-3" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Recommend an artist</h5>
+                        <p class="card-text">Expand your musical horizons based on your preferences</p>
+                        <button class="btn btn-secondary" tooltip="Recommends an artist" type="button" @onclick="RecommendArtist">Recommend</button>
+                    </div>
+                </div>
+                <div class="card mb-3" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Recommend an artist - international</h5>
+                        <p class="card-text">Supporting multiple languages</p>
+                        <button class="btn btn-secondary" tooltip="Interact in different languages" type="button" @onclick="OntdekNieuweMuziek">Recommend</button>
+                    </div>
+                </div>
+                <div class="card mb-3" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Speech API</h5>
+                        <p class="card-text">Expand your musical horizons</p>
+                        <button class="btn btn-secondary" tooltip="Interact by speaking" type="button" @onclick="Voice">Speak</button>
+                    </div>
+                </div>
+                <div class="card mb-3" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Rate your style</h5>
+                        <p class="card-text">Ask about the hate, violence, self-harm, and sexual content of your favourite artists</p>
+                        <button class="btn btn-secondary" tooltip="Determines whether lyrics and meaning are safe" type="button" @onclick="ContentSafety">Recommend</button>
+                    </div>
+                </div>
+                <div class="card mb-3" style="width: 18rem;">
+                    <div class="card-body">
+                        <h5 class="card-title">Discuss your personality</h5>
+                        <p class="card-text">Based on your musical taste</p>
+                        <button class="btn btn-secondary" tooltip="Full-on analysis in chat form" type="button" @onclick="DescribePersonality">Recommend</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-9">
+                <h3>PersonaliTune AI</h3>
+                @if (_aiAssistantOutput == null && !ShowChat && !loading && !error)
+                {
+                    <p>Please make a selection from the options on your left.</p>
+                }
+
+                @if (error)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @errorMessage
+                    </div>
+                }
+                @if (loading)
+                {
+                    <p>Loading....</p>
+                }
+
+                @if (ShowChat)
+                {
+                    <Chat></Chat>
+                }
+                else
+                {
+                    <p>@_aiAssistantOutput</p>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+
+    [Inject]
+    private ITokenService _tokenService { get; set; }
+
+    [Inject]
+    private ISpotifyApiService _spotifyApiService { get; set; }
+
+    [Inject]
+    private IOpenAiApiService _openAiApiService { get; set; }
+
+    bool loading = false;
+    bool ShowChat = false;
+    bool error = false;
+    bool connected = true;
+    string? errorMessage = null;
+    string? _aiAssistantOutput = null;
+    string? Token = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Token = await _tokenService.GetToken();
+        if (string.IsNullOrEmpty(Token))
+        {
+            connected = false;
+        }
+    }
+
+    private void InitiateNewRequest()
+    {
+        error = false;
+        loading = true;
+        _aiAssistantOutput = null;
+        ShowChat = false;
+    }
+
+    private void FinishWithError(string? message)
+    {
+        loading = false;
+        error = true;
+        errorMessage = message;
+    }
+
+    private void FinishSetUpChat()
+    {
+        ShowChat = true;
+        loading = false;
+    }
+
+    private void FinishWithOutput(string? output)
+    {
+        loading = false;
+        _aiAssistantOutput = output;
+    }
+
+    private async Task RecommendArtist()
+    {
+        InitiateNewRequest();
+
+        var artists = await _spotifyApiService.GetTopArtists(Token);
+        
+        ChatResult output = await _openAiApiService.GetRecommendedArtist(artists);        
+        
+        if (!output.IsSuccess)
+        {
+            FinishWithError(output.Content);
+        }
+        FinishWithOutput(output.Content);
+    }
+
+    private void Chat()
+    {
+        InitiateNewRequest();
+        FinishSetUpChat();
+    }
+
+    private async Task Voice()
+    {
+        InitiateNewRequest();
+        FinishWithError("This functionality has not been implemented yet.");
+    }
+
+    private async Task OntdekNieuweMuziek()
+    {
+        InitiateNewRequest();
+        FinishWithError("This functionality has not been implemented yet.");
+    }
+
+    private async Task ContentSafety()
+    {
+        InitiateNewRequest();
+        FinishWithError("This functionality has not been implemented yet.");
+    }
+
+    private async Task DescribePersonality()
+    {
+        InitiateNewRequest();
+        FinishWithError("This functionality has not been implemented yet.");
+    }
+}
+

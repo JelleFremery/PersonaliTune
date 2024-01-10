@@ -1,0 +1,121 @@
+﻿@page "/chat"
+@using PersonaliTune.Models.Prompts
+@using PersonaliTune.UI.Components
+@using PersonaliTune.UI.Models;
+@using System.Text.Json
+@using PersonaliTune.UI.Services
+
+<div class="chat-container">
+
+    <ConversationContext SearchModel="@SearchModel" IsVisible="@IsConversationContextVisible"></ConversationContext>
+
+    <div class="chat">
+        <CollapseButton IsOpen="@IsConversationContextVisible" OnClicked="OnHideSidePanelClicked"></CollapseButton>
+        <ConversationView Conversation="Conversation"></ConversationView>
+
+        <div class="input-area">
+            <LoadingIndicator IsBusy="@IsBusy" StatusText="@StatusText"></LoadingIndicator>
+            <ErrorIndicator ErrorText="@ErrorText"></ErrorIndicator>
+            <ChatInput SearchModel="@SearchModel" OnGenerateTextCompletionSubmitted="Search" IsBusy="@IsBusy"></ChatInput>
+        </div>
+    </div>
+
+</div>
+
+
+@code {
+    private bool IsConversationContextVisible = false;
+    private bool IsBusy = false;
+    private string StatusText = string.Empty;
+    private string ErrorText = string.Empty;
+
+    [Inject]
+    private IOpenAiApiService _openAiApiService { get; set; }
+
+    SearchModel SearchModel = new SearchModel()
+        {
+            SearchText = "",
+            SystemContext = "",
+            AssistantContext = ""
+        };
+    Conversation Conversation = new Conversation();
+
+    private void SetIsBusy(bool isBusy, string statusText = "")
+    {
+        this.IsBusy = isBusy;
+        this.StatusText = statusText;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        SearchModel.SystemContext = await _openAiApiService.GetDefaultSystemMessage();
+    }
+
+    public async Task Search()
+    {
+        AddUserMessageToConversation();
+        var prompts = CreatePrompts();        
+        AddAiMessageToConversation();
+        
+        SearchModel.SearchText = string.Empty;
+        SetIsBusy(true, "Generating text..");
+
+        try
+        {
+            await GetChatResponseAndUpdateConversation(prompts);
+        }
+        catch (Exception ex)
+        {
+            this.ErrorText = "An error has occurred " + ex.Message;
+        }
+        finally
+        {
+            SetIsBusy(false);
+        }
+    }
+
+    private void AddUserMessageToConversation()
+    {
+        Conversation.AddItem("User", SearchModel.SearchText);        
+    }
+
+    private List<Prompt> CreatePrompts()
+    {
+        return new List<Prompt>()
+        {
+            Prompt.Create(PromptRole.System, SearchModel.SystemContext),
+            Prompt.Create(PromptRole.Assistant, SearchModel.AssistantContext),
+            Prompt.Create(PromptRole.User, SearchModel.SearchText)
+        };
+    }
+
+    private void AddAiMessageToConversation()
+    {
+        Conversation.AddItem("AI", "");
+    }
+
+    private async Task GetChatResponseAndUpdateConversation(List<Prompt> messages)
+    {
+        var response = await _openAiApiService.GetStreamChat(messages);
+        using var stream = await response.Content.ReadAsStreamAsync();
+        var data = JsonSerializer.DeserializeAsyncEnumerable<string>(
+            stream,
+            new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true,
+                    DefaultBufferSize = 128
+                });
+        await foreach (var d in data)
+        {
+            this.Conversation.AppendToCurrentItem(d);
+            StateHasChanged();
+        }
+
+        SearchModel.AssistantContext += Conversation.GetCurrentItemMessage();
+    }
+
+    private void OnHideSidePanelClicked()
+    {
+        this.IsConversationContextVisible = !this.IsConversationContextVisible;
+    }
+}

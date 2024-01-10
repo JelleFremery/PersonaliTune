@@ -1,0 +1,44 @@
+﻿@using PersonaliTune.UI.Models;
+@using Markdig;
+@using ColorCode.Styling;
+@inject IJSRuntime JS
+
+<div class="conversation-area" @ref=ChatAreaRef>
+
+    @foreach (var result in Conversation.ConversationHistory)
+    {
+        <div class="conversation-item @(result.User == "AI" ? "ai-reply" : "")">
+            <div>
+                @((MarkupString)@RenderHtmlContent(@result.Message))
+            </div>
+        </div>
+    }
+</div>
+
+
+@code {
+    [Parameter]
+    public Conversation Conversation { get; set; }
+
+    private ElementReference ChatAreaRef;
+
+    private string RenderHtmlContent(string content) => Markdig.Markdown.ToHtml(
+       markdown: content,
+       pipeline: new MarkdownPipelineBuilder()
+       .UseAdvancedExtensions()
+       .UseSyntaxHighlighting(StyleDictionary.DefaultDark)
+       .Build()
+       );
+
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        ScrollToEnd();
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void ScrollToEnd()
+    {
+        JS.InvokeVoidAsync("ChatGPTMethods.scrollToEnd", new object[] { ChatAreaRef });
+    }
+}

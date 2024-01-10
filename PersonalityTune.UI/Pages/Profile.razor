@@ -1,0 +1,158 @@
+﻿@using System.Text.Json
+@using PersonaliTune.Models
+@using PersonaliTune.UI.Services
+@inject NavigationManager NavManager
+@page "/profile"
+
+<PageTitle>Profile</PageTitle>
+
+<h1>Profile</h1>
+
+@if (error)
+{
+    <div class="alert alert-danger" role="alert">
+        @errorMessage
+    </div>
+    <br />
+}
+
+@if (loading)
+{
+    <p>Loading....</p>
+    <br />
+}
+
+<div class="container container-fluid">
+    <div class="row">
+        @if (_profile != null)
+        {
+            <h2>About you</h2>
+            <div class="col">
+                <p>Name: @_profile.display_name</p>
+                <p>Email: @_profile.email</p>
+                <p>Country: @_profile.country</p>
+            </div>
+
+            <div class="col">
+
+                @if (_profile.images != null && _profile.images.Count > 0)
+                {
+                    <img src="@_profile.images.OrderByDescending(i => i.height).First().url" height="300" width="300" />
+                }
+            </div>
+            <br />
+        }
+    </div>
+</div>
+
+@if (_topArtistCollection?.items != null)
+{
+    <br />
+    <div class="container text-center">
+        <h2>Your favourite artists</h2>
+        <div class="row row-cols-3">
+
+            @foreach (var artist in _topArtistCollection.items)
+            {
+                @if (artist != null)
+                {
+                    <div class="card" style="width: 18rem;">
+                        <img src="@artist.images?[0].url" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">@artist.name</h5>
+                            <p class="card-text">Genre: @artist.genres?[0]</p>
+                            <p class="card-text">Your score: @artist.popularity</p>
+                            <a href="@artist.external_urls?.spotify" target="_blank" class="btn btn-primary">Go to artist</a>
+                        </div>
+                    </div>
+                }
+            }
+
+        </div>
+    </div>
+}
+
+@if (_topTrackCollection?.items != null)
+{
+    <br />
+
+    <div class="container text-center">
+        <h2>Your favourite tracks</h2>
+        <div class="row row-cols-3">
+
+            @foreach (var track in _topTrackCollection.items)
+            {
+                @if (track != null)
+                {
+                    <div class="card" style="width: 18rem;">
+                        <img src="@track.images?[0].url" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">@track.name</h5>
+                            @foreach (var artist in track.artists)
+                            {
+                                <p class="card-text">@artist.name</p>
+                            }
+                            <p class="card-text">Your score: @track.popularity</p>
+                            <a href="@track.external_urls?.spotify" target="_blank" class="btn btn-primary">Go to track</a>
+                        </div>
+                    </div>
+                }
+
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private PersonaliTune.Models.Profile? _profile;
+    private PersonaliTune.Models.ArtistCollection? _topArtistCollection;
+    private PersonaliTune.Models.TrackCollection? _topTrackCollection;
+
+    [Inject]
+    private ITokenService _tokenService { get; set; }
+
+    [Inject]
+    private ISpotifyApiService _spotifyApiService { get; set; }
+
+    bool loading = false;
+    bool error = false;
+    string? errorMessage = null;
+    string? Code = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await _tokenService.GetToken();
+        if (!string.IsNullOrEmpty(token))
+        {
+            loading = true;
+
+            var loadProfileTask = LoadProfile(token);
+            var loadTopArtistsTask = LoadTopArtists(token);
+            var loadTopTracksTask = LoadTopTracks(token);
+            await Task.WhenAll(loadProfileTask, loadTopArtistsTask, loadTopTracksTask);
+            
+            loading = false;
+        }
+        else
+        {
+            error = true;
+            errorMessage = "You need to connect a Spotify account first.";
+        }
+    }
+
+    private async Task LoadProfile(string token)
+    {
+        _profile = await _spotifyApiService.GetProfile(token);
+    }
+
+    private async Task LoadTopArtists(string token)
+    {
+        _topArtistCollection = await _spotifyApiService.GetTopArtists(token);
+    }
+
+    private async Task LoadTopTracks(string token)
+    {
+        _topTrackCollection = await _spotifyApiService.GetTopTracks(token);
+    }
+}
+

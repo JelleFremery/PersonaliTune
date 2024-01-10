@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Spotify</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' ">
+    <ExternalConsole>true</ExternalConsole>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' ">
+    <ExternalConsole>true</ExternalConsole>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />
+    <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
+    <PackageReference Include="Markdig" Version="0.34.0" />
+    <PackageReference Include="MarkdigExtensions.SyntaxHighlighting" Version="1.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="7.0.14" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Microsoft.EntityFrameworkCore" />
+    <None Remove="Microsoft.AspNet.WebApi.Client" />
+    <None Remove="Microsoft.AspNet.WebApi" />
+    <None Remove="Microsoft.AspNet.WebApi.Core" />
+    <None Remove="Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Components\ChatInput.razor" />
+    <None Include="Components\CollapseButton.razor" />
+    <None Include="Components\ConversationContext.razor" />
+    <None Include="Components\ConversationView.razor" />
+    <None Include="Components\ErrorIndicator.razor" />
+    <None Include="Components\LoadingIndicator.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PersonaliTune.Models\PersonaliTune.Models.csproj" />
+  </ItemGroup>
+</Project>

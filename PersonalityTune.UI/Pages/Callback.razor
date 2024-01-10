@@ -1,0 +1,83 @@
+﻿@using System.Text.Json
+@using PersonaliTune.Models
+@using Microsoft.AspNetCore.WebUtilities
+@using PersonaliTune.UI.Services
+
+@inject NavigationManager NavManager
+@page "/callback"
+
+<PageTitle>Callback</PageTitle>
+
+<h1>Callback</h1>
+
+<div>
+    @if (!string.IsNullOrWhiteSpace(Error))
+    {
+        <p>Error: @Error</p>
+    }
+    @if (!string.IsNullOrEmpty(Code))
+    {
+        <p>Code: @Code</p>
+    }
+    @if (!string.IsNullOrEmpty(Token))
+    {
+        <p>Token: @Token</p>
+    }
+</div>
+
+@code {
+    [Inject]
+    private ITokenService _tokenService { get; set; }
+
+    [Inject]
+    private ISpotifyApiService _spotifyApiService { get; set; }
+
+    private string? Code { get; set; }
+    private string? Token { get; set; }
+    private string? Error { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            ParseQueryParameters();
+
+            if (HasErrorOrNoCode())
+            {
+                StateHasChanged();
+                return;
+            }
+
+            await TryGetTokenAndSet();
+
+            NavManager.NavigateTo("/profile");
+        }
+    }
+
+    private void ParseQueryParameters()
+    {
+        var uri = new Uri(NavManager.Uri);
+        var queryParams = QueryHelpers.ParseQuery(uri.Query);
+
+        Code = queryParams.TryGetValue("code", out var code) ? code.First() : string.Empty;
+        Error = queryParams.TryGetValue("error", out var error) ? error.First() : string.Empty;
+    }
+
+    private bool HasErrorOrNoCode()
+    {
+        return string.IsNullOrWhiteSpace(Error) == false || string.IsNullOrWhiteSpace(Code);
+    }
+
+    private async Task TryGetTokenAndSet()
+    {
+        if (!string.IsNullOrEmpty(Code))
+        {
+            var token = await _spotifyApiService.GetToken(Code);
+            if (!string.IsNullOrEmpty(token))
+            {
+                Token = token;
+                await _tokenService.SetToken(token);
+            }
+        }
+    }
+}

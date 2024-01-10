@@ -1,0 +1,97 @@
+﻿@using System.Text.Json
+@using PersonaliTune.Models
+@using PersonaliTune.UI.Services
+@inject NavigationManager NavManager
+@page "/link"
+
+<PageTitle>Link</PageTitle>
+
+<h1>Link your Spotify account</h1>
+
+@if (Token == null)
+{
+    <div class="input-group mb-3">
+        <div class="input-group-append">
+            <button class="btn btn-secondary" tooltip="(Re)connects a Spotify profile" type="button" @onclick="Login"><img height="25" width="25" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Spotify_icon.svg/1982px-Spotify_icon.svg.png"><span style="margin-left: 10px;">Connect</span></button>
+        </div>
+    </div>
+}
+else
+{
+    <div class="input-group mb-3">
+        <div class="input-group-append">
+            <button class="btn btn-warning" tooltip="Disconnects your Spotify profile" type="button" @onclick="Logout">Disconnect</button>
+        </div>
+    </div>
+
+    <div class="alert alert-info">
+        <span>Your current token:</span> <span style="font-size: small;">@Token</span>
+    </div>
+}
+
+@if (error)
+{
+    <div class="alert alert-danger" role="alert">
+        Error: @errorMessage
+    </div>
+}
+
+@if (loading)
+{
+    <p>Loading....</p>
+}
+
+@code {
+
+    [Inject]
+    private ISpotifyApiService _spotifyApiService { get; set; }
+
+    [Inject]
+    private ITokenService _tokenService { get; set; }
+
+    bool loading = false;
+    bool error = false;
+    private string? errorMessage = null;
+
+    private string? Token = null;
+
+    private async Task Login()
+    {
+        await Logout();
+
+        error = false;
+        loading = true;
+
+        try
+        {
+            var response = await _spotifyApiService.GetLoginUrl();
+            if (!string.IsNullOrEmpty(response))
+            {
+                loading = false;
+                NavManager.NavigateTo(response);
+            }
+        }
+        catch (InvalidOperationException e)
+        {
+            errorMessage = $"Error making this request {e}";
+            error = true;
+        }
+
+        loading = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await _tokenService.GetToken();
+        if (!string.IsNullOrEmpty(token))
+        {
+            Token = token;
+        }
+    }
+    private async Task Logout()
+    {
+        await _tokenService.DeleteToken();        
+        Token = null;
+    }
+}
+
