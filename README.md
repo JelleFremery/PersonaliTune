@@ -4,11 +4,17 @@
 This project is a proof of concept for a service that generates various insights based on personal Spotify data.
 Its intended use is for the Betabit 2024 Q1 Deepdive AI session.
 
+## Getting started
+Create a Spotify Developer account.
+Create and app in your account and fill in the necessary data. 
+The UI runs on https://localhost:7238, so make sure to add that as the website url.
+The callback url should be https://localhost:7238/callback.
+
 ## Contents
 
 ### AzureOpenAI.Api
 An api that serves as a wrapper for the Azure OpenAI service API. It is used to generate text based on a prompt.
-It also contains prompt buildres that can be used to generate prompts for the api.
+It also contains prompt templates and prompt builders that can be used to generate prompts for the api.
 Finally, it serves as an abstraction for the interaction with the OpenAI API.
 
 ### Models
@@ -59,9 +65,14 @@ The AI assistant start discussing your personality and mood based on your musica
 
 ## Documentation
 Set up your own Spotify project using https://developer.spotify.com/documentation/web-api/tutorials/getting-started#create-an-app
+
 Spotify API docs: https://developer.spotify.com/documentation/web-api/
+
 Azure Open AI docs: https://learn.microsoft.com/en-us/azure/ai-services/openai/
+
 Translator docs: https://docs.microsoft.com/en-us/azure/cognitive-services/translator/translator-info-overview
+
 Speech docs: https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/
+
 Content Safety docs: https://learn.microsoft.com/en-us/azure/ai-services/content-safety/
 

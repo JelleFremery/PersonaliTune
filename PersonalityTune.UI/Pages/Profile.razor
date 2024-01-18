@@ -57,10 +57,13 @@
                 @if (artist != null)
                 {
                     <div class="card" style="width: 18rem;">
-                        <img src="@artist.images?[0].url" class="card-img-top" alt="...">
+                        @if (artist.images != null && artist.images.Count > 0)
+                        {
+                            <img src="@artist.images[0].url" class="card-img-top" alt="...">
+                        }
                         <div class="card-body">
                             <h5 class="card-title">@artist.name</h5>
-                            <p class="card-text">Genre: @artist.genres?[0]</p>
+                            <p class="card-text">Genre: @(artist.genres?.Count > 0 ? artist.genres[0] : "unknown")</p>
                             <p class="card-text">Your score: @artist.popularity</p>
                             <a href="@artist.external_urls?.spotify" target="_blank" class="btn btn-primary">Go to artist</a>
                         </div>
